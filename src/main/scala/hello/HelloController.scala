@@ -13,37 +13,30 @@ class HelloWorldController @Inject() (actorSystem: ActorSystem) extends Controll
   protected implicit def executor: ExecutionContext = actorSystem.dispatcher
 
   get("/users") { request: Request =>
-    if (request.containsParam("id")) {
-      println("GET one user request")
 
-      val id = request.getParam("id")
+    println("GET all users request")
 
-      val result = CaffeineCache.getUser(id).map(UserResponse)
+    println("Check database for all entries - does not cache results")
 
-      println("Check cache for existing entry - if entry already exists, the future will complete")
-      println(CaffeineCache.getUser(id))
+    val result = CaffeineCache.getUsersCache().map(UsersResponse)
 
-      println("GET one user response")
+    println("GET all users response")
 
-      result
-    } else {
-      println("GET all users request")
-
-      println("Check database for all entries - does not cache results")
-
-      val result = CaffeineCache.getUsersCache().map(UsersResponse)
-
-      println("GET all users response")
-
-      result
-    }
+    result
   }
 
-  get("/hi") { request: Request =>
-    "Hello " + request.params.getOrElse("name", "unnamed")
-  }
+  get("/users/:id") { request: Request =>
+    println("GET one user request")
 
-  post("/hi") { helloRequest: HelloRequest =>
-    "Hello " + helloRequest.name + " with id " + helloRequest.id
+    val id = request.getParam("id")
+
+    val result = CaffeineCache.getUser(id).map(UserResponse)
+
+    println("Check cache for existing entry - if entry already exists, the future will complete")
+    println(CaffeineCache.getUser(id))
+
+    println("GET one user response")
+
+    result
   }
 }
